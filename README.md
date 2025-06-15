@@ -85,14 +85,3 @@ fitatu/
 - Wszystkie endpointy API wymagają autentykacji
 - Dane wrażliwe są chronione przed nieautoryzowanym dostępem
 
-## Licencja
-
-Ten projekt jest dostępny na licencji MIT. Szczegóły znajdują się w pliku LICENSE.
-
-## Autor
-
-Sebastian Witkowski
-
-## Kontakt
-
-W razie pytań lub sugestii, prosimy o kontakt przez GitHub Issues. 
