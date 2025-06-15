@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Container dla tabeli celów */
+        .goals-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        /* Podstawowe style tabeli */
+        .goals-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Nagłówki i komórki tabeli */
+        .goals-table th {
+            background-color: #2a2a2a;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .goals-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+            color: #fff;
+        }
+
+        /* Efekt hover na wierszach */
+        .goals-table tr:hover {
+            background-color: #2a2a2a;
+        }
+
+        /* Pasek postępu */
+        .goals-table .progress {
+            width: 100px;
+            height: 20px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .goals-table .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+        /* Przyciski akcji */
+        .goals-table .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .goals-table .btn-sm {
+            padding: 4px 8px;
+        }
+
+        /* Status (badge) */
+        .goals-table .badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .goals-table .badge.bg-success {
+            background-color: #4CAF50;
+        }
+
+        .goals-table .badge.bg-secondary {
+            background-color: #666;
+        }
+
+        /* Typ celu */
+        .goals-table .goal-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .goals-table .goal-type i {
+            color: #4CAF50;
+        }
+
+        /* Wartości */
+        .goals-table .current-value,
+        .goals-table .target-value {
+            font-weight: 500;
+        }
+
+        /* Komunikat o braku danych */
+        .goals-table .no-data {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+
+        /* Responsywność */
+        @media screen and (max-width: 768px) {
+            .goals-table th,
+            .goals-table td {
+                padding: 8px;
+            }
+
+            .goals-table .progress {
+                width: 80px;
+            }
+
+            .goals-table .actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+        }
+
+        /* Dodatkowe style dla nowych elementów */
+        .text-success {
+            color: #4CAF50 !important;
+        }
+        
+        .text-danger {
+            color: #f44336 !important;
+        }
+
+        .difference {
+            font-weight: 500;
+        }
+
+        .initial-value,
+        .current-value,
+        .target-value {
+            font-weight: 500;
+        }
+
+        .badge.bg-primary {
+            background-color: #2196F3 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #f44336 !important;
+        }
+
+        /* Responsywność dla nowych kolumn */
+        @media screen and (max-width: 1200px) {
+            .goals-table th,
+            .goals-table td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .goals-table-container {
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-primary mb-4">Cele i Pomiary</h1>
+        <div class="page-header">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#goalModal">
+                <i class="fas fa-plus"></i> Dodaj cel
+            </button>
+        </div>
+
+        <div class="main-goal-section mb-4">
+            <div class="card bg-dark text-light border-secondary">
+                <div class="card-body">
+                    <h3 class="text-light">Główny cel</h3>
+                    <form id="mainGoalForm" class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label for="mainGoal" class="form-label text-light">Twój główny cel</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="mainGoal" name="goal" required>
+                                <option value="lose_weight" <%= user.goal === 'lose_weight' ? 'selected' : '' %>>Redukcja wagi</option>
+                                <option value="maintain" <%= user.goal === 'maintain' ? 'selected' : '' %>>Utrzymanie wagi</option>
+                                <option value="gain_weight" <%= user.goal === 'gain_weight' ? 'selected' : '' %>>Przyrost masy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary">Zapisz cel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="goals-section">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterGoalStatus">Status:</label>
+                    <select id="filterGoalStatus" class="form-select">
+                        <option value="all">Wszystkie cele</option>
+                        <option value="active">Aktywne</option>
+                        <option value="completed">Zakończone</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dateRange">Zakres dat:</label>
+                    <select id="dateRange" class="form-select">
+                        <option value="7">Ostatnie 7 dni</option>
+                        <option value="30">Ostatnie 30 dni</option>
+                        <option value="90">Ostatnie 90 dni</option>
+                        <option value="all">Wszystkie</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#goalModal">
+                        <i class="fas fa-plus"></i> Dodaj cel
+                    </button>
+                </div>
+            </div>
+
+            <div class="goals-table-container">
+                <table class="goals-table">
+                    <thead>
+                        <tr>
+                            <th>Typ pomiaru</th>
+                            <th>Wartość początkowa</th>
+                            <th>Aktualna wartość</th>
+                            <th>Różnica</th>
+                            <th>Cel</th>
+                            <th>Postęp</th>
+                            <th>Data rozpoczęcia</th>
+                            <th>Data zakończenia</th>
+                            <th>Status</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goalsTableBody">
+                        <% if (goals && goals.length > 0) { %>
+                            <% goals.forEach(goal => { %>
+                                <tr>
+                                    <td>
+                                        <div class="goal-type">
+                                            <i class="fas <%= goal.measurementType === 'weight' ? 'fa-weight' : 'fa-ruler' %>"></i>
+                                            <%= goal.measurementType === 'weight' ? 'Waga' :
+                                                goal.measurementType === 'chest' ? 'Klatka piersiowa' :
+                                                goal.measurementType === 'biceps' ? 'Biceps' :
+                                                goal.measurementType === 'waist' ? 'Pas' :
+                                                goal.measurementType === 'hips' ? 'Biodra' :
+                                                goal.measurementType === 'thigh' ? 'Udo' :
+                                                goal.measurementType === 'calf' ? 'Łydka' : goal.measurementType %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="initial-value">
+                                            <%= goal.initialValue %> <%= goal.measurementType === 'weight' ? 'kg' : 'cm' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="current-value">
+                                            <%= goal.currentValue %> <%= goal.measurementType === 'weight' ? 'kg' : 'cm' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="difference <%= goal.currentValue - goal.initialValue > 0 ? 'text-success' : 'text-danger' %>">
+                                            <%= goal.currentValue - goal.initialValue > 0 ? '+' : '' %><%= (goal.currentValue - goal.initialValue).toFixed(1) %> <%= goal.measurementType === 'weight' ? 'kg' : 'cm' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="target-value">
+                                            <%= goal.targetValue %> <%= goal.measurementType === 'weight' ? 'kg' : 'cm' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 aria-valuenow="<%= goal.progress %>" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"
+                                                 style="width: <%= goal.progress %>%">
+                                                <%= goal.progress %>%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%= new Date(goal.startDate).toLocaleDateString() %></td>
+                                    <td><%= new Date(goal.endDate).toLocaleDateString() %></td>
+                                    <td>
+                                        <span class="badge <%= goal.status === 'active' ? 'bg-success' : 
+                                                             goal.status === 'completed' ? 'bg-primary' : 
+                                                             'bg-danger' %>">
+                                            <%= goal.status === 'active' ? 'Aktywny' : 
+                                               goal.status === 'completed' ? 'Zakończony' : 
+                                               'Nieudany' %>
+                                        </span>
+                                    </td>
+                                    <td class="actions">
+                                        <button class="btn btn-sm btn-outline-primary edit-goal" 
+                                                data-goal-id="<%= goal._id %>"
+                                                data-bs-toggle="tooltip"
+                                                title="Edytuj cel">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-goal"
+                                                data-goal-id="<%= goal._id %>"
+                                                data-bs-toggle="tooltip"
+                                                title="Usuń cel">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="10" class="no-data">Brak celów do wyświetlenia</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Postęp celów</h3>
+                <div class="chart-wrapper">
+                    <canvas id="goalsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do dodawania/edycji celu -->
+    <div class="modal fade" id="goalModal" tabindex="-1" aria-labelledby="goalModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="goalModalTitle">Dodaj cel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="goalForm" onsubmit="return false;">
+                        <div class="mb-3">
+                            <label for="measurementType" class="form-label">Typ pomiaru</label>
+                            <select class="form-select" id="measurementType" name="measurementType" required>
+                                <option value="">Wybierz typ pomiaru</option>
+                                <option value="weight">Waga</option>
+                                <option value="chest">Klatka piersiowa</option>
+                                <option value="biceps">Biceps</option>
+                                <option value="waist">Pas</option>
+                                <option value="hips">Biodra</option>
+                                <option value="thigh">Udo</option>
+                                <option value="calf">Łydka</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="initialValue" class="form-label">Wartość początkowa <span class="measurement-unit">kg</span></label>
+                            <input type="number" class="form-control" id="initialValue" name="initialValue" required min="0" step="0.1">
+                            <small class="form-text text-muted">Aktualna wartość będzie pobierana z najnowszego pomiaru</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="targetValue" class="form-label">Wartość docelowa <span class="measurement-unit">kg</span></label>
+                            <input type="number" class="form-control" id="targetValue" name="targetValue" required min="0" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Data rozpoczęcia</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">Data zakończenia</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" required>
+                        </div>
+                        <div class="alert alert-danger d-none" id="goalFormError"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                            <button type="submit" class="btn btn-primary" id="goalModalSubmit">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Debugowanie ładowania skryptów
+        console.log('Ładowanie skryptów...');
+        window.addEventListener('error', function(e) {
+            console.error('Błąd ładowania skryptu:', e);
+            console.error('Szczegóły błędu:', {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                error: e.error
+            });
+        });
+    </script>
+    <script src="/js/goals.js" defer onload="console.log('Skrypt goals.js załadowany')" onerror="console.error('Błąd ładowania skryptu goals.js')"></script>
+    <script>
+        // Sprawdzenie czy skrypt został załadowany
+        window.addEventListener('load', function() {
+            console.log('Wszystkie zasoby załadowane');
+            if (typeof initializeGoals === 'function') {
+                console.log('Funkcja initializeGoals jest dostępna');
+                initializeGoals();
+            } else {
+                console.error('Funkcja initializeGoals nie jest dostępna');
+            }
+        });
+    </script>
+</body>
+</html> 

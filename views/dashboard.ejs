@@ -1,0 +1,198 @@
+<div class="container">
+    <div class="dashboard">
+        <div class="dashboard__header">
+            <h1>Mój profil</h1>
+            <div class="dashboard__user-info">
+                <div class="user-avatar">
+                    <span class="user-avatar__initials"><%= user.name.charAt(0).toUpperCase() %></span>
+                </div>
+                <div class="user-details">
+                    <h2><%= user.name %></h2>
+                    <p class="user-email"><%= user.email %></p>
+                    <p class="user-join-date">Dołączył: <%= new Date(user.createdAt).toLocaleDateString('pl-PL') %></p>
+                </div>
+            </div>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert--error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert--success">
+                <%= success %>
+            </div>
+        <% } %>
+
+        <div class="dashboard__grid">
+            <div class="dashboard__main">
+                <div class="dashboard__stats">
+                    <div class="stat-card">
+                        <h3>Twoje cele</h3>
+                        <div class="stat-content">
+                            <p>
+                                <span>Cel:</span>
+                                <span class="value"><%= user.goal === 'lose_weight' ? 'Redukcja wagi' : user.goal === 'maintain' ? 'Utrzymanie wagi' : 'Przyrost masy' %></span>
+                            </p>
+                            <p>
+                                <span>Aktywność:</span>
+                                <span class="value"><%= user.activity %></span>
+                            </p>
+                            <div class="stat-actions">
+                                <a href="/goals" class="btn btn--small btn--primary">Zmień cele</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Twoje dane</h3>
+                        <div class="stat-content">
+                            <p>
+                                <span>Waga:</span>
+                                <span class="value"><%= user.weight %> kg</span>
+                            </p>
+                            <p>
+                                <span>Wzrost:</span>
+                                <span class="value"><%= user.height %> cm</span>
+                            </p>
+                            <p>
+                                <span>Wiek:</span>
+                                <span class="value"><%= user.age %> lat</span>
+                            </p>
+                            <div class="stat-actions">
+                                <button class="btn btn--small btn--primary" onclick="openUpdateDataModal()">Aktualizuj dane</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Twoje zapotrzebowanie</h3>
+                        <div class="stat-content">
+                            <p>
+                                <span>BMR:</span>
+                                <span class="value"><%= user.calculateBMR() %> kcal</span>
+                            </p>
+                            <p>
+                                <span>TDEE:</span>
+                                <span class="value"><%= user.calculateTDEE() %> kcal</span>
+                            </p>
+                            <div class="stat-info">
+                                <small>* BMR - podstawowa przemiana materii</small>
+                                <small>* TDEE - całkowita przemiana materii</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard__quick-actions">
+                    <h3>Szybkie akcje</h3>
+                    <div class="quick-actions-grid">
+                        <a href="/menu" class="quick-action-card">
+                            <span class="quick-action-icon">📝</span>
+                            <span class="quick-action-text">Dodaj posiłek</span>
+                        </a>
+                        <a href="/measurements" class="quick-action-card">
+                            <span class="quick-action-icon">📊</span>
+                            <span class="quick-action-text">Statystyki</span>
+                        </a>
+                        <a href="/goals" class="quick-action-card">
+                            <span class="quick-action-icon">🎯</span>
+                            <span class="quick-action-text">Cele</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard__actions">
+            <a href="/logout" class="btn btn--danger">Wyloguj się</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal do aktualizacji danych -->
+<div class="modal" id="updateDataModal">
+    <div class="modal__content">
+        <div class="modal__header">
+            <h2>Aktualizuj dane</h2>
+            <button class="modal__close" onclick="closeUpdateDataModal()">&times;</button>
+        </div>
+        <form id="updateDataForm" class="measurement-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="updateWeight">Waga (kg)</label>
+                    <input type="number" id="updateWeight" name="weight" required min="30" max="300" step="0.1" value="<%= user.weight %>">
+                </div>
+                <div class="form-group">
+                    <label for="updateHeight">Wzrost (cm)</label>
+                    <input type="number" id="updateHeight" name="height" required min="100" max="250" step="0.1" value="<%= user.height %>">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="updateAge">Wiek</label>
+                    <input type="number" id="updateAge" name="age" required min="16" max="100" value="<%= user.age %>">
+                </div>
+                <div class="form-group">
+                    <label for="updateGoal">Cel</label>
+                    <select id="updateGoal" name="goal" required>
+                        <option value="lose_weight" <%= user.goal === 'lose_weight' ? 'selected' : '' %>>Redukcja wagi</option>
+                        <option value="maintain" <%= user.goal === 'maintain' ? 'selected' : '' %>>Utrzymanie wagi</option>
+                        <option value="gain_weight" <%= user.goal === 'gain_weight' ? 'selected' : '' %>>Przyrost masy</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="closeUpdateDataModal()">Anuluj</button>
+                <button type="submit" class="btn btn--primary">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUpdateDataModal() {
+    document.getElementById('updateDataModal').classList.add('active');
+}
+
+function closeUpdateDataModal() {
+    document.getElementById('updateDataModal').classList.remove('active');
+}
+
+document.getElementById('updateDataForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        weight: parseFloat(document.getElementById('updateWeight').value),
+        height: parseFloat(document.getElementById('updateHeight').value),
+        age: parseInt(document.getElementById('updateAge').value),
+        goal: document.getElementById('updateGoal').value
+    };
+
+    try {
+        const response = await fetch('/api/user/update-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Wystąpił błąd podczas aktualizacji danych');
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            window.location.reload();
+        } else {
+            alert(result.message || 'Wystąpił błąd podczas aktualizacji danych');
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+});
+</script> 

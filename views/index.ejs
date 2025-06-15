@@ -1,0 +1,45 @@
+<div class="hero">
+    <div class="hero__content">
+        <div class="hero__icon">
+            <i class="fas fa-dumbbell"></i>
+        </div>
+        <h1 class="hero__title">Monitoruj swoją dietę i osiągaj cele fitness</h1>
+        <p class="hero__description">Fitatu pomoże Ci śledzić posiłki, kalorie i makroskładniki, abyś mógł osiągnąć swoje cele fitness.</p>
+        <div class="hero__buttons">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/dashboard" class="button button--primary">Mój profil</a>
+            <% } else { %>
+                <a href="/login" class="button button--primary">Zaloguj się</a>
+                <a href="/register" class="button button--secondary">Dołącz teraz</a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<div class="features">
+    <h2 class="features__title">Dlaczego Fitatu?</h2>
+    <div class="features__grid">
+        <div class="feature-card">
+            <h3>Śledź posiłki</h3>
+            <p>Łatwo dodawaj i monitoruj swoje posiłki, aby utrzymać zdrową dietę.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Oblicz zapotrzebowanie</h3>
+            <p>Poznaj swoje dzienne zapotrzebowanie kaloryczne i makroskładniki.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Osiągaj cele</h3>
+            <p>Ustaw cele i śledź swój postęp w czasie rzeczywistym.</p>
+        </div>
+    </div>
+</div>
+
+<div class="cta">
+    <h2>Rozpocznij swoją podróż do lepszego zdrowia</h2>
+    <p>Dołącz do Fitatu i zacznij monitorować swoją dietę już dziś!</p>
+    <% if (typeof user === 'undefined' || !user) { %>
+        <a href="/register" class="button button--primary">Dołącz teraz</a>
+    <% } else { %>
+        <a href="/dashboard" class="button button--primary">Przejdź do profilu</a>
+    <% } %>
+</div> 

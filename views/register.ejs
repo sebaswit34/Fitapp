@@ -1,0 +1,95 @@
+<section class="auth">
+    <div class="auth__container">
+        <h1 class="auth__title">Rejestracja</h1>
+        
+        <% if (typeof error !== 'undefined') { %>
+            <div class="alert alert--error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form class="auth__form" action="/register" method="POST">
+            <div class="form__group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="twoj@email.com">
+            </div>
+
+            <div class="form__group">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Minimum 8 znaków">
+            </div>
+
+            <div class="form__group">
+                <label for="confirmPassword">Potwierdź hasło</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required 
+                       placeholder="Powtórz hasło">
+            </div>
+
+            <div class="form__group">
+                <label for="name">Imię</label>
+                <input type="text" id="name" name="name" required 
+                       placeholder="Twoje imię">
+            </div>
+
+            <div class="form__group">
+                <label for="age">Wiek</label>
+                <input type="number" id="age" name="age" required 
+                       min="15" max="100" placeholder="Twój wiek">
+            </div>
+
+            <div class="form__group">
+                <label for="gender">Płeć</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Wybierz płeć</option>
+                    <option value="male">Mężczyzna</option>
+                    <option value="female">Kobieta</option>
+                    <option value="other">Inna</option>
+                </select>
+            </div>
+
+            <div class="form__group">
+                <label for="height">Wzrost (cm)</label>
+                <input type="number" id="height" name="height" required 
+                       min="100" max="250" placeholder="Twój wzrost w cm">
+            </div>
+
+            <div class="form__group">
+                <label for="weight">Waga (kg)</label>
+                <input type="number" id="weight" name="weight" required 
+                       min="30" max="300" step="0.1" placeholder="Twoja waga w kg">
+            </div>
+
+            <div class="form__group">
+                <label for="activity">Poziom aktywności</label>
+                <select id="activity" name="activity" required>
+                    <option value="">Wybierz poziom aktywności</option>
+                    <option value="sedentary">Siedzący tryb życia</option>
+                    <option value="light">Lekko aktywny (1-3 treningi/tydzień)</option>
+                    <option value="moderate">Umiarkowanie aktywny (3-5 treningów/tydzień)</option>
+                    <option value="active">Aktywny (6-7 treningów/tydzień)</option>
+                    <option value="very_active">Bardzo aktywny (codzienny trening)</option>
+                </select>
+            </div>
+
+            <div class="form__group">
+                <label for="goal">Cel</label>
+                <select id="goal" name="goal" required>
+                    <option value="">Wybierz cel</option>
+                    <option value="lose_weight">Redukcja wagi</option>
+                    <option value="maintain">Utrzymanie wagi</option>
+                    <option value="gain_weight">Przyrost masy</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button button--primary button--full">
+                Zarejestruj się
+            </button>
+        </form>
+
+        <p class="auth__footer">
+            Masz już konto? <a href="/login">Zaloguj się</a>
+        </p>
+    </div>
+</section> 

@@ -1,0 +1,41 @@
+<section class="auth">
+    <div class="auth__container">
+        <h1 class="auth__title">Logowanie</h1>
+        
+        <% if (typeof error !== 'undefined') { %>
+            <div class="alert alert--error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form class="auth__form" action="/login" method="POST">
+            <div class="form__group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="twoj@email.com">
+            </div>
+
+            <div class="form__group">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Twoje hasło">
+            </div>
+
+            <div class="form__group form__group--checkbox">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Zapamiętaj mnie</label>
+            </div>
+
+            <button type="submit" class="button button--primary button--full">
+                Zaloguj się
+            </button>
+        </form>
+
+        <div class="auth__links">
+            <a href="/forgot-password" class="auth__link">Zapomniałeś hasła?</a>
+            <p class="auth__footer">
+                Nie masz konta? <a href="/register">Zarejestruj się</a>
+            </p>
+        </div>
+    </div>
+</section> 

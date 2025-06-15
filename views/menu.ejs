@@ -1,0 +1,563 @@
+<%- contentFor('body') %>
+
+<div class="menu">
+    <div class="menu__header">
+        <h1>Mój Jadłospis</h1>
+        <div class="menu__actions">
+            <button class="btn btn--primary" id="addMealBtn">
+                <i class="fas fa-plus"></i> Dodaj Posiłek
+            </button>
+            <button class="btn btn--secondary" id="changeCaloriesBtn">
+                <i class="fas fa-calculator"></i> Zmień Kaloryczność
+            </button>
+        </div>
+    </div>
+
+    <div class="menu__content">
+        <div class="menu__filters">
+            <div class="date-filter">
+                <div class="date-filter__header">
+                    <h3 class="date-filter__title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Wybierz datę
+                    </h3>
+                    <div class="date-filter__actions">
+                        <button class="btn btn--icon" id="prevWeekBtn" title="Poprzedni tydzień">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn--icon" id="todayBtn" title="Dzisiaj">
+                            <i class="fas fa-calendar-day"></i>
+                        </button>
+                        <button class="btn btn--icon" id="nextWeekBtn" title="Następny tydzień">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="week-view">
+                    <div class="week-view__days">
+                        <!-- Dni tygodnia będą generowane przez JavaScript -->
+                    </div>
+                    <div class="week-view__dates">
+                        <!-- Daty będą generowane przez JavaScript -->
+                    </div>
+                </div>
+                <div class="date-filter__calendar">
+                    <button class="btn btn--calendar" id="openCalendarBtn">
+                        <i class="fas fa-calendar"></i>
+                        Wybierz inną datę
+                    </button>
+                    <input type="date" id="dateFilter" class="form-control" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <div class="menu__meals">
+            <!-- Podsumowanie dnia -->
+            <div class="daily-summary">
+                <div class="daily-summary__header">
+                    <h2 class="daily-summary__title">
+                        <i class="fas fa-chart-pie"></i>
+                        Podsumowanie dnia
+                    </h2>
+                    <div class="daily-summary__date" id="summaryDate"></div>
+                </div>
+                <div class="daily-summary__content">
+                    <div class="daily-summary__item">
+                        <i class="fas fa-fire"></i>
+                        <div class="daily-summary__info">
+                            <span class="daily-summary__value" id="totalCalories">0</span>
+                            <span class="daily-summary__label">kcal</span>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" id="caloriesProgress" style="width: 0%"></div>
+                            </div>
+                            <span class="daily-summary__target">Cel: <span id="caloriesTarget"><%= user.dailyGoals.calories %></span> kcal</span>
+                        </div>
+                    </div>
+                    <div class="daily-summary__item">
+                        <i class="fas fa-drumstick-bite"></i>
+                        <div class="daily-summary__info">
+                            <span class="daily-summary__value" id="totalProtein">0</span>
+                            <span class="daily-summary__label">g białka</span>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" id="proteinProgress" style="width: 0%"></div>
+                            </div>
+                            <span class="daily-summary__target">Cel: <span id="proteinTarget"><%= user.dailyGoals.protein %></span> g</span>
+                        </div>
+                    </div>
+                    <div class="daily-summary__item">
+                        <i class="fas fa-bread-slice"></i>
+                        <div class="daily-summary__info">
+                            <span class="daily-summary__value" id="totalCarbs">0</span>
+                            <span class="daily-summary__label">g węglowodanów</span>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" id="carbsProgress" style="width: 0%"></div>
+                            </div>
+                            <span class="daily-summary__target">Cel: <span id="carbsTarget"><%= user.dailyGoals.carbs %></span> g</span>
+                        </div>
+                    </div>
+                    <div class="daily-summary__item">
+                        <i class="fas fa-cheese"></i>
+                        <div class="daily-summary__info">
+                            <span class="daily-summary__value" id="totalFat">0</span>
+                            <span class="daily-summary__label">g tłuszczu</span>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" id="fatProgress" style="width: 0%"></div>
+                            </div>
+                            <span class="daily-summary__target">Cel: <span id="fatTarget"><%= user.dailyGoals.fat %></span> g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Śniadanie -->
+            <div class="meal-section meal-section--breakfast">
+                <div class="meal-section__header">
+                    <h2 class="meal-section__title">
+                        <i class="fas fa-coffee"></i>
+                        Śniadanie
+                    </h2>
+                    <button class="btn btn--primary meal-section__add" onclick="addMeal('breakfast')">
+                        <i class="fas fa-plus"></i> Dodaj
+                    </button>
+                </div>
+                <div class="meal-section__grid">
+                    <% const breakfastMeals = meals.filter(meal => meal.type === 'breakfast') %>
+                    <% if (breakfastMeals.length > 0) { %>
+                        <% breakfastMeals.forEach(meal => { %>
+                            <div class="meal-card" data-meal-id="<%= meal._id %>" data-date="<%= meal.date.toISOString().split('T')[0] %>">
+                                <div class="meal-card__header">
+                                    <h3><%= meal.name %></h3>
+                                </div>
+                                <div class="meal-info">
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-fire"></i>
+                                        <span><%= meal.calories %> kcal</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-drumstick-bite"></i>
+                                        <span><%= meal.protein %>g białka</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-bread-slice"></i>
+                                        <span><%= meal.carbs %>g węglowodanów</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-cheese"></i>
+                                        <span><%= meal.fat %>g tłuszczu</span>
+                                    </div>
+                                </div>
+                                <div class="meal-actions">
+                                    <button class="btn btn--edit" onclick="editMeal('<%= meal._id %>')" data-tooltip="Edytuj posiłek">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn--delete" onclick="deleteMeal('<%= meal._id %>')" data-tooltip="Usuń posiłek">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="meal-section__empty">
+                            <i class="fas fa-coffee"></i>
+                            <p>Brak posiłków na śniadanie</p>
+                            <button class="btn btn--primary" onclick="addMeal('breakfast')">
+                                Dodaj śniadanie
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Obiad -->
+            <div class="meal-section meal-section--lunch">
+                <div class="meal-section__header">
+                    <h2 class="meal-section__title">
+                        <i class="fas fa-utensils"></i>
+                        Obiad
+                    </h2>
+                    <button class="btn btn--primary meal-section__add" onclick="addMeal('lunch')">
+                        <i class="fas fa-plus"></i> Dodaj
+                    </button>
+                </div>
+                <div class="meal-section__grid">
+                    <% const lunchMeals = meals.filter(meal => meal.type === 'lunch') %>
+                    <% if (lunchMeals.length > 0) { %>
+                        <% lunchMeals.forEach(meal => { %>
+                            <div class="meal-card" data-meal-id="<%= meal._id %>" data-date="<%= meal.date.toISOString().split('T')[0] %>">
+                                <div class="meal-card__header">
+                                    <h3><%= meal.name %></h3>
+                                </div>
+                                <div class="meal-info">
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-fire"></i>
+                                        <span><%= meal.calories %> kcal</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-drumstick-bite"></i>
+                                        <span><%= meal.protein %>g białka</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-bread-slice"></i>
+                                        <span><%= meal.carbs %>g węglowodanów</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-cheese"></i>
+                                        <span><%= meal.fat %>g tłuszczu</span>
+                                    </div>
+                                </div>
+                                <div class="meal-actions">
+                                    <button class="btn btn--edit" onclick="editMeal('<%= meal._id %>')" data-tooltip="Edytuj posiłek">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn--delete" onclick="deleteMeal('<%= meal._id %>')" data-tooltip="Usuń posiłek">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="meal-section__empty">
+                            <i class="fas fa-utensils"></i>
+                            <p>Brak posiłków na obiad</p>
+                            <button class="btn btn--primary" onclick="addMeal('lunch')">
+                                Dodaj obiad
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Kolacja -->
+            <div class="meal-section meal-section--dinner">
+                <div class="meal-section__header">
+                    <h2 class="meal-section__title">
+                        <i class="fas fa-moon"></i>
+                        Kolacja
+                    </h2>
+                    <button class="btn btn--primary meal-section__add" onclick="addMeal('dinner')">
+                        <i class="fas fa-plus"></i> Dodaj
+                    </button>
+                </div>
+                <div class="meal-section__grid">
+                    <% const dinnerMeals = meals.filter(meal => meal.type === 'dinner') %>
+                    <% if (dinnerMeals.length > 0) { %>
+                        <% dinnerMeals.forEach(meal => { %>
+                            <div class="meal-card" data-meal-id="<%= meal._id %>" data-date="<%= meal.date.toISOString().split('T')[0] %>">
+                                <div class="meal-card__header">
+                                    <h3><%= meal.name %></h3>
+                                </div>
+                                <div class="meal-info">
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-fire"></i>
+                                        <span><%= meal.calories %> kcal</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-drumstick-bite"></i>
+                                        <span><%= meal.protein %>g białka</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-bread-slice"></i>
+                                        <span><%= meal.carbs %>g węglowodanów</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-cheese"></i>
+                                        <span><%= meal.fat %>g tłuszczu</span>
+                                    </div>
+                                </div>
+                                <div class="meal-actions">
+                                    <button class="btn btn--edit" onclick="editMeal('<%= meal._id %>')" data-tooltip="Edytuj posiłek">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn--delete" onclick="deleteMeal('<%= meal._id %>')" data-tooltip="Usuń posiłek">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="meal-section__empty">
+                            <i class="fas fa-moon"></i>
+                            <p>Brak posiłków na kolację</p>
+                            <button class="btn btn--primary" onclick="addMeal('dinner')">
+                                Dodaj kolację
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Przekąski -->
+            <div class="meal-section meal-section--snack">
+                <div class="meal-section__header">
+                    <h2 class="meal-section__title">
+                        <i class="fas fa-cookie"></i>
+                        Przekąski
+                    </h2>
+                    <button class="btn btn--primary meal-section__add" onclick="addMeal('snack')">
+                        <i class="fas fa-plus"></i> Dodaj
+                    </button>
+                </div>
+                <div class="meal-section__grid">
+                    <% const snackMeals = meals.filter(meal => meal.type === 'snack') %>
+                    <% if (snackMeals.length > 0) { %>
+                        <% snackMeals.forEach(meal => { %>
+                            <div class="meal-card" data-meal-id="<%= meal._id %>" data-date="<%= meal.date.toISOString().split('T')[0] %>">
+                                <div class="meal-card__header">
+                                    <h3><%= meal.name %></h3>
+                                </div>
+                                <div class="meal-info">
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-fire"></i>
+                                        <span><%= meal.calories %> kcal</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-drumstick-bite"></i>
+                                        <span><%= meal.protein %>g białka</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-bread-slice"></i>
+                                        <span><%= meal.carbs %>g węglowodanów</span>
+                                    </div>
+                                    <div class="meal-info__item">
+                                        <i class="fas fa-cheese"></i>
+                                        <span><%= meal.fat %>g tłuszczu</span>
+                                    </div>
+                                </div>
+                                <div class="meal-actions">
+                                    <button class="btn btn--edit" onclick="editMeal('<%= meal._id %>')" data-tooltip="Edytuj posiłek">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn--delete" onclick="deleteMeal('<%= meal._id %>')" data-tooltip="Usuń posiłek">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="meal-section__empty">
+                            <i class="fas fa-cookie"></i>
+                            <p>Brak przekąsek</p>
+                            <button class="btn btn--primary" onclick="addMeal('snack')">
+                                Dodaj przekąskę
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal do dodawania/edycji posiłku -->
+<div class="modal" id="mealModal">
+    <div class="modal__content">
+        <div class="modal__header">
+            <h2 id="modalTitle">Dodaj Posiłek</h2>
+            <button class="modal__close">&times;</button>
+        </div>
+        <form id="mealForm" class="meal-form">
+            <input type="hidden" id="mealId">
+            <div class="form-group">
+                <label for="mealName">Nazwa posiłku</label>
+                <input type="text" id="mealName" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="mealType">Typ posiłku</label>
+                <select id="mealType" name="type" required>
+                    <option value="breakfast">Śniadanie</option>
+                    <option value="lunch">Obiad</option>
+                    <option value="dinner">Kolacja</option>
+                    <option value="snack">Przekąska</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mealCalories">Kalorie (kcal)</label>
+                    <input type="number" id="mealCalories" name="calories" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="mealProtein">Białko (g)</label>
+                    <input type="number" id="mealProtein" name="protein" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mealCarbs">Węglowodany (g)</label>
+                    <input type="number" id="mealCarbs" name="carbs" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="mealFat">Tłuszcz (g)</label>
+                    <input type="number" id="mealFat" name="fat" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mealDescription">Opis (opcjonalnie)</label>
+                <textarea id="mealDescription" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="closeModal()">Anuluj</button>
+                <button type="submit" class="btn btn--primary">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal do zmiany kaloryczności -->
+<div class="modal" id="caloriesModal">
+    <div class="modal__content">
+        <div class="modal__header">
+            <h2>Ustaw Dzienne Cele</h2>
+            <button class="modal__close" onclick="closeCaloriesModal()">&times;</button>
+        </div>
+        <form id="caloriesForm" class="calories-form">
+            <div class="form-group">
+                <label for="dailyCalories">Dzienna kaloryczność (kcal)</label>
+                <input type="number" id="dailyCalories" name="calories" required min="1000" max="5000" step="50" value="2000">
+            </div>
+            <div class="form-group">
+                <label for="proteinPercentage">Procent białka (%)</label>
+                <input type="number" id="proteinPercentage" name="proteinPercentage" required min="10" max="50" step="1" value="30">
+            </div>
+            <div class="form-group">
+                <label for="carbsPercentage">Procent węglowodanów (%)</label>
+                <input type="number" id="carbsPercentage" name="carbsPercentage" required min="20" max="60" step="1" value="40">
+            </div>
+            <div class="form-group">
+                <label for="fatPercentage">Procent tłuszczu (%)</label>
+                <input type="number" id="fatPercentage" name="fatPercentage" required min="20" max="40" step="1" value="30">
+            </div>
+            <div class="macros-preview">
+                <h3>Podsumowanie makroskładników:</h3>
+                <div class="macros-preview__item">
+                    <span>Białko:</span>
+                    <span id="proteinPreview">0</span> g
+                </div>
+                <div class="macros-preview__item">
+                    <span>Węglowodany:</span>
+                    <span id="carbsPreview">0</span> g
+                </div>
+                <div class="macros-preview__item">
+                    <span>Tłuszcz:</span>
+                    <span id="fatPreview">0</span> g
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="closeCaloriesModal()">Anuluj</button>
+                <button type="submit" class="btn btn--primary">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function addMeal(type) {
+    document.getElementById('modalTitle').textContent = 'Dodaj Posiłek';
+    document.getElementById('mealForm').reset();
+    document.getElementById('mealId').value = '';
+    document.getElementById('mealType').value = type;
+    document.getElementById('mealModal').classList.add('active');
+}
+
+function closeCaloriesModal() {
+    document.getElementById('caloriesModal').classList.remove('active');
+}
+
+// Funkcja do aktualizacji podglądu makroskładników
+function updateMacrosPreview() {
+    const calories = parseInt(document.getElementById('dailyCalories').value) || 0;
+    const proteinPercentage = parseInt(document.getElementById('proteinPercentage').value) || 0;
+    const carbsPercentage = parseInt(document.getElementById('carbsPercentage').value) || 0;
+    const fatPercentage = parseInt(document.getElementById('fatPercentage').value) || 0;
+
+    // Oblicz gramy makroskładników (1g białka = 4kcal, 1g węglowodanów = 4kcal, 1g tłuszczu = 9kcal)
+    const proteinGrams = Math.round((calories * proteinPercentage / 100) / 4);
+    const carbsGrams = Math.round((calories * carbsPercentage / 100) / 4);
+    const fatGrams = Math.round((calories * fatPercentage / 100) / 9);
+
+    document.getElementById('proteinPreview').textContent = proteinGrams;
+    document.getElementById('carbsPreview').textContent = carbsGrams;
+    document.getElementById('fatPreview').textContent = fatGrams;
+}
+
+// Dodaj obsługę zmiany wartości w formularzu kaloryczności
+document.getElementById('caloriesForm').addEventListener('input', updateMacrosPreview);
+
+// Obsługa formularza kaloryczności
+document.getElementById('caloriesForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        calories: parseInt(document.getElementById('dailyCalories').value),
+        proteinPercentage: parseInt(document.getElementById('proteinPercentage').value),
+        carbsPercentage: parseInt(document.getElementById('carbsPercentage').value),
+        fatPercentage: parseInt(document.getElementById('fatPercentage').value)
+    };
+
+    try {
+        const response = await fetch('/api/user/update-calories', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Wystąpił błąd podczas aktualizacji kaloryczności');
+        }
+
+        closeCaloriesModal();
+        window.location.reload();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+// Obsługa przycisku zmiany kaloryczności
+document.getElementById('changeCaloriesBtn').addEventListener('click', function() {
+    document.getElementById('caloriesModal').classList.add('active');
+    updateMacrosPreview();
+});
+</script>
+
+<style>
+.calories-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.macros-preview {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.macros-preview h3 {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.macros-preview__item {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.macros-preview__item:last-child {
+    border-bottom: none;
+}
+
+.macros-preview__item span:first-child {
+    color: #666;
+}
+
+.macros-preview__item span:last-child {
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style> 

@@ -1,0 +1,282 @@
+<%- contentFor('body') %>
+
+<div class="measurements">
+    <div class="measurements__header">
+        <h1>Moje Pomiary</h1>
+        <div class="measurements__actions">
+            <button class="btn btn--primary" id="addMeasurementBtn">
+                <i class="fas fa-plus"></i> Dodaj Pomiar
+            </button>
+        </div>
+    </div>
+
+    <div class="measurements__content">
+        <div class="measurements__filters">
+            <div class="date-filter">
+                <div class="date-filter__header">
+                    <h3 class="date-filter__title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Wybierz datę
+                    </h3>
+                    <div class="date-filter__actions">
+                        <button class="btn btn--icon" id="prevWeekBtn" title="Poprzedni tydzień">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn--icon" id="todayBtn" title="Dzisiaj">
+                            <i class="fas fa-calendar-day"></i>
+                        </button>
+                        <button class="btn btn--icon" id="nextWeekBtn" title="Następny tydzień">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="week-view">
+                    <div class="week-view__days">
+                        <!-- Dni tygodnia będą generowane przez JavaScript -->
+                    </div>
+                    <div class="week-view__dates">
+                        <!-- Daty będą generowane przez JavaScript -->
+                    </div>
+                </div>
+                <div class="date-filter__calendar">
+                    <button class="btn btn--calendar" id="openCalendarBtn">
+                        <i class="fas fa-calendar"></i>
+                        Wybierz inną datę
+                    </button>
+                    <input type="date" id="dateFilter" class="form-control" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <% if (measurements && measurements.length > 0) { %>
+            <!-- Tabela podstawowych pomiarów -->
+            <div class="measurements-table">
+                <h2>Podstawowe pomiary</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Waga (kg)</th>
+                                <th>Wzrost (cm)</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% measurements.forEach(measurement => { %>
+                                <tr data-date="<%= measurement.date.toISOString().split('T')[0] %>">
+                                    <td><%= new Date(measurement.date).toLocaleDateString('pl-PL') %></td>
+                                    <td><%= measurement.weight %></td>
+                                    <td><%= measurement.height %></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn--small btn--edit" onclick="editMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn--small btn--delete" onclick="deleteMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <div class="measurements__empty" style="display: none;">
+                        <i class="fas fa-ruler"></i>
+                        <p>Brak pomiarów podstawowych</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela pomiarów górnej części ciała -->
+            <div class="measurements-table">
+                <h2>Górna część ciała</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Ramie (cm)</th>
+                                <th>Klatka piersiowa (cm)</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% measurements.forEach(measurement => { %>
+                                <tr data-date="<%= measurement.date.toISOString().split('T')[0] %>">
+                                    <td><%= new Date(measurement.date).toLocaleDateString('pl-PL') %></td>
+                                    <td><%= measurement.biceps %></td>
+                                    <td><%= measurement.chest %></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn--small btn--edit" onclick="editMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn--small btn--delete" onclick="deleteMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <div class="measurements__empty" style="display: none;">
+                        <i class="fas fa-ruler"></i>
+                        <p>Brak pomiarów górnej części ciała</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela pomiarów tułowia -->
+            <div class="measurements-table">
+                <h2>Tułów</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Talia (cm)</th>
+                                <th>Biodra (cm)</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% measurements.forEach(measurement => { %>
+                                <tr data-date="<%= measurement.date.toISOString().split('T')[0] %>">
+                                    <td><%= new Date(measurement.date).toLocaleDateString('pl-PL') %></td>
+                                    <td><%= measurement.waist %></td>
+                                    <td><%= measurement.hips %></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn--small btn--edit" onclick="editMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn--small btn--delete" onclick="deleteMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <div class="measurements__empty" style="display: none;">
+                        <i class="fas fa-ruler"></i>
+                        <p>Brak pomiarów tułowia</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela pomiarów nóg -->
+            <div class="measurements-table">
+                <h2>Nogi</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Udo (cm)</th>
+                                <th>Łydka (cm)</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% measurements.forEach(measurement => { %>
+                                <tr data-date="<%= measurement.date.toISOString().split('T')[0] %>">
+                                    <td><%= new Date(measurement.date).toLocaleDateString('pl-PL') %></td>
+                                    <td><%= measurement.thigh %></td>
+                                    <td><%= measurement.calf %></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn--small btn--edit" onclick="editMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn--small btn--delete" onclick="deleteMeasurement('<%= measurement._id %>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <div class="measurements__empty" style="display: none;">
+                        <i class="fas fa-ruler"></i>
+                        <p>Brak pomiarów nóg</p>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="measurements__empty">
+                <i class="fas fa-ruler"></i>
+                <p>Brak pomiarów</p>
+                <button class="btn btn--primary" onclick="addMeasurement()">
+                    Dodaj pierwszy pomiar
+                </button>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Modal do dodawania/edycji pomiaru -->
+<div class="modal" id="measurementModal">
+    <div class="modal__content">
+        <div class="modal__header">
+            <h2 id="modalTitle">Dodaj Pomiar</h2>
+            <button class="modal__close">&times;</button>
+        </div>
+        <form id="measurementForm" class="measurement-form">
+            <input type="hidden" id="measurementId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="measurementWeight">Waga (kg)</label>
+                    <input type="number" id="measurementWeight" name="weight" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="measurementHeight">Wzrost (cm)</label>
+                    <input type="number" id="measurementHeight" name="height" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="measurementBiceps">Obwód ramienia (cm)</label>
+                    <input type="number" id="measurementBiceps" name="biceps" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="measurementChest">Obwód klatki piersiowej (cm)</label>
+                    <input type="number" id="measurementChest" name="chest" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="measurementWaist">Obwód talii (cm)</label>
+                    <input type="number" id="measurementWaist" name="waist" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="measurementHips">Obwód bioder (cm)</label>
+                    <input type="number" id="measurementHips" name="hips" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="measurementThigh">Obwód uda (cm)</label>
+                    <input type="number" id="measurementThigh" name="thigh" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="measurementCalf">Obwód łydki (cm)</label>
+                    <input type="number" id="measurementCalf" name="calf" required min="0" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="measurementDate">Data pomiaru</label>
+                    <input type="date" id="measurementDate" name="date" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="measurementNotes">Notatki (opcjonalnie)</label>
+                <textarea id="measurementNotes" name="notes" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="closeModal()">Anuluj</button>
+                <button type="submit" class="btn btn--primary">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/measurements.js" defer></script> 
