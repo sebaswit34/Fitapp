@@ -34,7 +34,7 @@ Fitatu to nowoczesna aplikacja webowa pomagająca użytkownikom monitorować swo
 
 - Node.js (wersja 14 lub wyższa)
 - MongoDB
-- npm lub yarn
+- npm 
 
 ## Instalacja
 
